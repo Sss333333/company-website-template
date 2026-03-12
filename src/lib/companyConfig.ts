@@ -1,1 +1,1 @@
-export const COMPANY_NAME = 'CAGANTECH'; 
+export const COMPANY_NAME = '粤展环保科技有限公司'; 
