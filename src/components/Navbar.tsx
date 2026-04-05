@@ -28,6 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ isNewsEnabled }) => {
       { name: t('projects'), href: '/projects' },
       { name: t('about'), href: '/about' },
       { name: t('contact'), href: '/contact' },
+      { name: t('aiChat'), href: '/chatbot' },
   ];
 
   const navLinks = isNewsEnabled

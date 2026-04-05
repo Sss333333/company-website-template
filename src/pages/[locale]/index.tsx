@@ -1,4 +1,5 @@
 import { NextPage } from 'next';
+import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { getStaticPaths, makeStaticProps } from '../../lib/getStatic';
 
@@ -28,6 +29,10 @@ const Home: NextPage = () => {
   const { t } = useTranslation('common'); // eslint-disable-line @typescript-eslint/no-unused-vars 
   
   return (
+    <>
+      <Head>
+        <title>Tech Company</title>
+      </Head>
     <div className={`${geistSans.className} ${geistMono.className} font-[family-name:var(--font-geist-sans)]`}>
       <Hero />
       <Partners />
@@ -36,6 +41,7 @@ const Home: NextPage = () => {
       <AboutUsVariant />
       <Testimonials />
     </div>
+    </>
   );
 }
 

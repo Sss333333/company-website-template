@@ -2,7 +2,8 @@
   "home": "Home",
   "partners": "Partners",
   "projects": "Projects",
-  "about": "About Us",
-  "contact": "Contact Us",
-  "news": "News"
-} 
+  "about": "About",
+  "contact": "Contact",
+  "news": "News",
+  "aiChat": "AI Assistant"
+}

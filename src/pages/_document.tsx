@@ -12,9 +12,7 @@ class MyDocument extends Document {
     const currentLocale = this.props.__NEXT_DATA__.query.locale || i18nextConfig.i18n.defaultLocale;
   return (
     <Html lang={currentLocale as string}>
-      <Head>
-        <title>Tech Company Website Template</title>
-      </Head>
+      <Head />
       <body className="antialiased">
         <Main />
         <NextScript />
