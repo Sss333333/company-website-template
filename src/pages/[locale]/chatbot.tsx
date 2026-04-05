@@ -17,7 +17,7 @@ export default function ChatbotPage() {
         <h1 className="text-3xl font-bold mb-8 text-center">{t('heading')}</h1>
         <div className="rounded-lg shadow-lg overflow-hidden">
           <iframe
-            src="http://39.101.77.129:8088/chatbot/aSNlVJXKb2FwuagB"
+            src="https://39.101.77.129/chatbot/aSNlVJXKb2FwuagB"
             style={{ width: '100%', height: '700px', minHeight: '700px' }}
             frameBorder="0"
             allow="microphone"
