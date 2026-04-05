@@ -87,7 +87,7 @@ const ContactPage: NextPage = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Contact Info & Hours */}
           <div className="bg-white p-8 rounded-lg shadow-md">
              <h2 className="text-2xl md:text-3xl font-semibold text-black font-[Poppins] mb-6">{t('info.title', { defaultValue: '联系方式'})}</h2>
@@ -113,11 +113,9 @@ const ContactPage: NextPage = () => {
                  </span>
                </li>
              </ul>
-             {/* Optional: Map */}
-             {/* <div className="mt-8 h-64 bg-gray-200 rounded-md">地图嵌入位置</div> */}
           </div>
 
-          {/* Right Column: Contact Form */}
+          {/* Middle Column: Contact Form */}
           <div className="bg-white p-8 rounded-lg shadow-md">
             <h2 className="text-2xl md:text-3xl font-semibold text-black font-[Poppins] mb-6">{t('form.title', { defaultValue: '给我们留言'})}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -186,7 +184,6 @@ const ContactPage: NextPage = () => {
                  </button>
               </div>
               
-              {/* Status Messages */}
               {submitStatus === 'success' && (
                 <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded">
                   {t('form.successMessage', { defaultValue: "消息已发送！我们会尽快与您联系。"})}
@@ -198,6 +195,20 @@ const ContactPage: NextPage = () => {
                 </div>
               )}
             </form>
+          </div>
+
+          {/* Right Column: AI Chatbot */}
+          <div className="bg-white p-8 rounded-lg shadow-md">
+            <h2 className="text-2xl md:text-3xl font-semibold text-black font-[Poppins] mb-6">AI客服</h2>
+            <div className="rounded-lg overflow-hidden border border-gray-200">
+              <iframe
+                src="http://39.101.77.129:8088/chatbot/aSNlVJXKb2FwuagB"
+                style={{ width: '100%', height: '500px', minHeight: '500px' }}
+                frameBorder="0"
+                allow="microphone"
+                title="AI Chatbot"
+              />
+            </div>
           </div>
         </div>
       </div>
