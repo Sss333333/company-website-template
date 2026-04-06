@@ -202,7 +202,7 @@ const ContactPage: NextPage = () => {
             <h2 className="text-2xl md:text-3xl font-semibold text-black font-[Poppins] mb-6">AI客服</h2>
             <div className="rounded-lg overflow-hidden border border-gray-200">
               <iframe
-                src="http://yuezhan.dpdns.org/chat/EpGZlMGBrTw9V81i"
+                src="https://yuezhan.dpdns.org/chat/EpGZlMGBrTw9V81i"
                 style={{ width: '100%', height: '500px', minHeight: '500px' }}
                 frameBorder="0"
                 allow="microphone"
