@@ -41,4 +41,10 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+# local node binaries and packages
+node-installer.msi
+*.msi
+node-portable.zip
+*.zip
+node-v*-win-x64/
+tunnel.log

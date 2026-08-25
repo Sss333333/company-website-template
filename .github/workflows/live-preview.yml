@@ -1,0 +1,121 @@
+name: 🌐 临时在线预览 (Cloudflare Tunnel)
+
+on:
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: '预览保持时长（分钟）'
+        required: true
+        default: '30'
+        type: choice
+        options:
+          - '15'
+          - '30'
+          - '60'
+          - '120'
+
+jobs:
+  live-preview:
+    name: 启动临时预览服务
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 检出代码
+        uses: actions/checkout@v4
+
+      - name: ⚙️ 配置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 安装项目依赖
+        run: npm install
+
+      - name: 🏗️ 构建 Next.js 项目
+        run: npm run build
+        env:
+          PLASMIC_CMS_ID: ${{ secrets.PLASMIC_CMS_ID || 'ignore' }}
+          PLASMIC_CMS_PUBLIC_TOKEN: ${{ secrets.PLASMIC_CMS_PUBLIC_TOKEN || '' }}
+          NEXT_PUBLIC_WEB3FORMS_KEY: ${{ secrets.NEXT_PUBLIC_WEB3FORMS_KEY || '' }}
+
+      - name: 🚀 启动本地 Web 服务
+        run: |
+          # 判断如果是静态导出 (out 目录存在)，使用 serve 托管，否则启动 dev 服务
+          if [ -d "./out" ]; then
+            echo "检测到静态导出目录 ./out，使用 serve 启动..."
+            npx --yes serve ./out -l 3000 &
+          else
+            echo "未检测到 out 目录，使用 npm run dev 启动..."
+            npm run dev -- -p 3000 &
+          fi
+
+          # 等待服务端口就绪
+          for i in {1..30}; do
+            if curl -s http://localhost:3000 > /dev/null; then
+              echo "✅ Web 服务已在 http://localhost:3000 成功启动！"
+              break
+            fi
+            echo "等待服务启动中... ($i/30)"
+            sleep 1
+          done
+
+      - name: 🚇 启动 Cloudflare 临时隧道
+        id: tunnel
+        run: |
+          # 1. 下载并安装官方 cloudflared
+          curl -sL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o cloudflared.deb
+          sudo dpkg -i cloudflared.deb
+
+          # 2. 启动隧道并写入日志
+          cloudflared tunnel --url http://localhost:3000 --logfile tunnel.log &
+
+          # 3. 循环等待并提取临时公网 URL
+          TUNNEL_URL=""
+          for i in {1..20}; do
+            if [ -f tunnel.log ]; then
+              TUNNEL_URL=$(grep -o 'https://[-a-zA-Z0-9@:%._\+~#=]*\.trycloudflare.com' tunnel.log | head -n 1)
+              if [ -n "$TUNNEL_URL" ]; then
+                break
+              fi
+            fi
+            echo "正在获取公网访问链接... ($i/20)"
+            sleep 1
+          done
+
+          if [ -z "$TUNNEL_URL" ]; then
+            echo "❌ 未能成功获取 Cloudflare 临时链接，请查看完整日志："
+            cat tunnel.log
+            exit 1
+          fi
+
+          echo "tunnel_url=$TUNNEL_URL" >> $GITHUB_OUTPUT
+
+          # 4. 打印醒目的终端提示
+          echo "================================================================"
+          echo "🎉 临时预览链接已成功生成！"
+          echo ""
+          echo "👉 访问地址: $TUNNEL_URL"
+          echo "⏱️ 本次服务将保持运行: ${{ github.event.inputs.duration }} 分钟"
+          echo "💡 如需提前结束，可在 GitHub Actions 页面点击右上角 'Cancel workflow'"
+          echo "================================================================"
+
+          # 5. 生成 GitHub Actions 页面摘要卡片 (Job Summary)
+          echo "## 🌐 网站临时预览已上线" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> 🔗 **访问链接：** [点击打开预览 ($TUNNEL_URL)]($TUNNEL_URL)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| 配置项 | 说明 |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **临时网址** | \`$TUNNEL_URL\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **保持时长** | ${{ github.event.inputs.duration }} 分钟 |" >> $GITHUB_STEP_SUMMARY
+          echo "| **触发方式** | 手动触发 (workflow_dispatch) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "*(提示：直接点击上方链接即可在浏览器或手机中查看网站效果)*" >> $GITHUB_STEP_SUMMARY
+
+      - name: ⏳ 保持预览服务运行
+        run: |
+          MINUTES=${{ github.event.inputs.duration }}
+          SECONDS=$((MINUTES * 60))
+          echo "预览服务已就绪，保持运行 $MINUTES 分钟 ($SECONDS 秒)..."
+          sleep $SECONDS
